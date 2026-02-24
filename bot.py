@@ -8,7 +8,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, Cal
 
 # --- CONFIG ---
 TOKEN = "8615286526:AAEX65kXROmTVafC7ttG0LrGOstLIiLTQJ0"
-PORT = int(os.environ.get("PORT", 10000)) 🚢
+PORT = int(os.environ.get("PORT", 10000)) # 🚢
 
 # --- UTILS ---
 GLITCH_CHARS = ["!", "@", "#", "$", "%", "^", "&", "*", "Ø", "Σ", "☣️"]
@@ -51,7 +51,7 @@ async def handle_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # --- MAIN ENGINE ---
 async def main():
-    await start_web_server() 🌐
+    await start_web_server() # 🌐
     
     application = ApplicationBuilder().token(TOKEN).build()
     application.add_handler(CommandHandler("start", start))
@@ -61,7 +61,7 @@ async def main():
     async with application:
         await application.initialize()
         await application.start_polling()
-        # Keeps the bot running indefinitely
+        print("Bot is polling...")
         await asyncio.Event().wait()
 
 if __name__ == '__main__':
