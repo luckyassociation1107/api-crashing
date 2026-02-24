@@ -7,8 +7,10 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 
 # --- CONFIG ---
+# Mee Telegram Bot Token ikkada undali
 TOKEN = "8615286526:AAEX65kXROmTVafC7ttG0LrGOstLIiLTQJ0"
-PORT = int(os.environ.get("PORT", 10000)) # Render provides the port
+# Render provide chese PORT ni use chestunnam
+PORT = int(os.environ.get("PORT", 10000)) 
 
 # --- UTILS ---
 GLITCH_CHARS = ["!", "@", "#", "$", "%", "^", "&", "*", "Ø", "Σ", "☣️"]
@@ -16,7 +18,7 @@ GLITCH_CHARS = ["!", "@", "#", "$", "%", "^", "&", "*", "Ø", "Σ", "☣️"]
 def get_glitch_text(length=20):
     return "".join(random.choices(GLITCH_CHARS + list(string.ascii_uppercase), k=length))
 
-# --- WEB SERVER (For UptimeRobot) ---
+# --- WEB SERVER (Health Check for Render/UptimeRobot) ---
 async def handle_health_check(request):
     return web.Response(text="Officer Rakshak is Active 🛡️")
 
@@ -27,7 +29,7 @@ async def start_web_server():
     await runner.setup()
     site = web.TCPSite(runner, "0.0.0.0", PORT)
     await site.start()
-    print(f"Web server started on port {PORT}")
+    print(f"Web server started on port {PORT} 🌐")
 
 # --- BOT HANDLERS ---
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -55,30 +57,30 @@ async def handle_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # --- MAIN ENGINE ---
 async def main():
-    # 1. Web Server ni start chestunnam
-    await start_web_server() # 🌐
-
-    # 2. Application build chestunnam
+    # 1. Application setup
     application = ApplicationBuilder().token(TOKEN).build()
     
-    # 3. Handlers add chestunnam
+    # 2. Handlers registration
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CallbackQueryHandler(button_callback))
     application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_input))
     
-    # 4. Bot ni correct steps tho start chestunnam 🚀
+    # 3. Bot initialization
     await application.initialize()
     await application.start()
     
-    if application.updater:
-        await application.updater.start_polling()
-        print("Bot is polling...")
-    
-    # 5. Loop aagakunda wait chestunnam
-    await asyncio.Event().wait()
+    print("Starting Web Server and Bot Polling... 🚀")
+
+    # 4. Web server mariyu Bot polling renditini parallel ga run chestunnam
+    # Deeni valla Render health check fail avvadu
+    await asyncio.gather(
+        start_web_server(),
+        application.updater.start_polling(),
+        asyncio.Event().wait()
+    )
 
 if __name__ == '__main__':
     try:
         asyncio.run(main())
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, SystemExit):
         pass
