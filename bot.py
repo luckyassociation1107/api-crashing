@@ -7,10 +7,8 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 
 # --- CONFIG ---
-# Mee Telegram Bot Token ikkada undali
 TOKEN = "8615286526:AAEX65kXROmTVafC7ttG0LrGOstLIiLTQJ0"
-# Render provide chese PORT ni use chestunnam
-PORT = int(os.environ.get("PORT", 10000)) 
+PORT = int(os.environ.get("PORT", 10000)) # Render provides this port 🚢
 
 # --- UTILS ---
 GLITCH_CHARS = ["!", "@", "#", "$", "%", "^", "&", "*", "Ø", "Σ", "☣️"]
@@ -18,7 +16,7 @@ GLITCH_CHARS = ["!", "@", "#", "$", "%", "^", "&", "*", "Ø", "Σ", "☣️"]
 def get_glitch_text(length=20):
     return "".join(random.choices(GLITCH_CHARS + list(string.ascii_uppercase), k=length))
 
-# --- WEB SERVER (Health Check for Render/UptimeRobot) ---
+# --- WEB SERVER (For Render Health Check) ---
 async def handle_health_check(request):
     return web.Response(text="Officer Rakshak is Active 🛡️")
 
@@ -35,17 +33,13 @@ async def start_web_server():
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [[InlineKeyboardButton("🛑 TERMINATE SESSION", callback_data='start_attack')]]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text(
-        "🔴 **RAKSHAK TERMINAL**\n------------------\nSelect operation:", 
-        reply_markup=reply_markup, 
-        parse_mode="Markdown"
-    )
+    await update.message.reply_text("🔴 **RAKSHAK TERMINAL**\nSelect operation:", reply_markup=reply_markup, parse_mode="Markdown")
 
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     if query.data == 'start_attack':
-        await query.edit_message_text("📡 **TARGET ACQUISITION**\nEnter target mobile number:")
+        await query.edit_message_text("📡 Enter target mobile number:")
         context.user_data['state'] = 'WAITING_FOR_NUM'
 
 async def handle_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -57,22 +51,21 @@ async def handle_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # --- MAIN ENGINE ---
 async def main():
-    # 1. Application setup
+    # Application builder setup
     application = ApplicationBuilder().token(TOKEN).build()
     
-    # 2. Handlers registration
+    # Handlers add cheyyadam
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CallbackQueryHandler(button_callback))
     application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_input))
     
-    # 3. Bot initialization
+    # Bot initialization
     await application.initialize()
     await application.start()
     
-    print("Starting Web Server and Bot Polling... 🚀")
+    print("Starting Web Server and Bot... 🚀")
 
-    # 4. Web server mariyu Bot polling renditini parallel ga run chestunnam
-    # Deeni valla Render health check fail avvadu
+    # Web Server mariyu Bot Polling parallel ga run avvali
     await asyncio.gather(
         start_web_server(),
         application.updater.start_polling(),
