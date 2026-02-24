@@ -8,7 +8,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, Cal
 
 # --- CONFIG ---
 TOKEN = "8615286526:AAEX65kXROmTVafC7ttG0LrGOstLIiLTQJ0"
-PORT = int(os.environ.get("PORT", 10000)) # 🚢
+PORT = int(os.environ.get("PORT", 10000)) # Render provides the port
 
 # --- UTILS ---
 GLITCH_CHARS = ["!", "@", "#", "$", "%", "^", "&", "*", "Ø", "Σ", "☣️"]
@@ -33,36 +33,52 @@ async def start_web_server():
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [[InlineKeyboardButton("🛑 TERMINATE SESSION", callback_data='start_attack')]]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text("🔴 **RAKSHAK TERMINAL**\nSelect operation:", reply_markup=reply_markup, parse_mode="Markdown")
+    await update.message.reply_text(
+        "🔴 **RAKSHAK TERMINAL**\n------------------\nSelect operation:", 
+        reply_markup=reply_markup, 
+        parse_mode="Markdown"
+    )
 
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     if query.data == 'start_attack':
-        await query.edit_message_text("📡 Enter target mobile number:")
+        await query.edit_message_text("📡 **TARGET ACQUISITION**\nEnter target mobile number:")
         context.user_data['state'] = 'WAITING_FOR_NUM'
 
 async def handle_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if context.user_data.get('state') == 'WAITING_FOR_NUM':
         msg = await update.message.reply_text("⚡ Initializing breach...")
         await asyncio.sleep(1)
-        await msg.edit_text(f"⚠️ **SYSTEM CRASH**\n`{get_glitch_text(20)}`")
+        await msg.edit_text(f"⚠️ **SYSTEM CRASH**\n`{get_glitch_text(25)}`")
         context.user_data['state'] = None
 
 # --- MAIN ENGINE ---
 async def main():
+    # 1. Web Server ni start chestunnam
     await start_web_server() # 🌐
-    
+
+    # 2. Application build chestunnam
     application = ApplicationBuilder().token(TOKEN).build()
+    
+    # 3. Handlers add chestunnam
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CallbackQueryHandler(button_callback))
     application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_input))
     
-    async with application:
-        await application.initialize()
-        await application.start_polling()
+    # 4. Bot ni correct steps tho start chestunnam 🚀
+    await application.initialize()
+    await application.start()
+    
+    if application.updater:
+        await application.updater.start_polling()
         print("Bot is polling...")
-        await asyncio.Event().wait()
+    
+    # 5. Loop aagakunda wait chestunnam
+    await asyncio.Event().wait()
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        pass
